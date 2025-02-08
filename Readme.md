@@ -4,6 +4,9 @@ restream les texture a la main
 # World Interactions
 Create interaction points in the world with selectable options adapted for RedM.
 
+#Original Repo
+https://github.com/darktrovx/interact
+
 # Credits
 [ChatDisabled](https://github.com/Chatdisabled)
 
