@@ -7,7 +7,7 @@
 
 return {
     Debug = GetConvar('debug', 'false') == 'true' and true or false, -- Enable / Disable debug mode
-    Style = 'redm_native_murphy', -- redm_native_murphy or redm_native_muziq
+    Style = 'redm_native_muziq', -- redm_native_murphy or redm_native_muziq, redm_native_murphy can make people crash for unknown reason 
     Textures = { -- Do not change
         pin = 'pin',
         interact = 'interact',
