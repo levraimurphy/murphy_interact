@@ -10,8 +10,8 @@ local DrawSprite = DrawSprite
 local ClearDrawOrigin = ClearDrawOrigin
 local Wait = Wait
 local IsControlJustPressed = IsControlJustPressed
--- local SetScriptGfxAlignParams = SetScriptGfxAlignParams
--- local ResetScriptGfxAlign = Citizen.InvokeNative(0xE3A3DB414A373DAB)
+local SetScriptGfxAlignParams = SetScriptGfxAlignParams
+local ResetScriptGfxAlign = Citizen.InvokeNative(0xE3A3DB414A373DAB)
 local IsNuiFocused = IsNuiFocused
 local IsPedDeadOrDying = IsPedDeadOrDying
 local IsPedCuffed = IsPedCuffed
@@ -78,11 +78,11 @@ local function CreateInteractions()
                     -- Citizen.InvokeNative(0xF5A2C681787E579D, 0.0, 0.0, 0.0, 0.0)
                     
                     SetDrawOrigin(coords.x, coords.y, coords.z)
-                    -- SetScriptGfxDrawOrder(2 --[[ integer ]])
+                    SetScriptGfxDrawOrder(2 --[[ integer ]])
                     DrawSprite(settings.Style, interact, 0, 0, 0.0185, 0.03333333333333333, 0, 255, 255, 255, IsNightTime() and 200 or alpha)
-                    -- SetScriptGfxDrawOrder(4)
+                    SetScriptGfxDrawOrder(4)
                     -- Citizen.InvokeNative(0xE3A3DB414A373DAB)
-                    -- Citizen.InvokeNative(0xE3A3DB414A373DAB)
+                    Citizen.InvokeNative(0xE3A3DB414A373DAB)
                     local optionAmount = #options
                     local showDot = optionAmount > 1
 
@@ -116,10 +116,10 @@ local function CreateInteractions()
                 else
 
                     SetDrawOrigin(coords.x, coords.y, coords.z + 0.05)
-                    -- SetScriptGfxDrawOrder(2 --[[ integer ]])
+                    SetScriptGfxDrawOrder(2 --[[ integer ]])
                     DrawSprite(settings.Style, pin, 0, 0, 0.010, 0.025, 0, 255, 255, 255, isPrimary and currentAlpha or 255)
-                    -- SetScriptGfxDrawOrder(4)
-                    -- Citizen.InvokeNative(0xE3A3DB414A373DAB)
+                    SetScriptGfxDrawOrder(4)
+                    Citizen.InvokeNative(0xE3A3DB414A373DAB)
                 end
 
                 ClearDrawOrigin()
@@ -178,7 +178,7 @@ CreateThread(function ()
 
             if nearbyAmount > 0 and not disableInteraction then
                 wait = 0
-                if IsControlPressed(0, 0x8AAA0AD4) then
+                if IsControlPressed(0, settings.keybind) then
                     showinteraction = true
                 else
                     showinteraction = false

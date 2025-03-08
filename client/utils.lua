@@ -9,9 +9,9 @@ local SetTextCentre = SetTextCentre
 local AddTextComponentSubstringPlayerName = AddTextComponentSubstringPlayerName
 local SetTextJustification = SetTextJustification
 local EndTextCommandDisplayText = EndTextCommandDisplayText
--- local SetScriptGfxAlignParams = Citizen.InvokeNative(0xF5A2C681787E579D)
+local SetScriptGfxAlignParams = Citizen.InvokeNative(0xF5A2C681787E579D)
 local SetDrawOrigin = SetDrawOrigin
--- local ResetScriptGfxAlign = Citizen.InvokeNative(0xE3A3DB414A373DAB)
+local ResetScriptGfxAlign = Citizen.InvokeNative(0xE3A3DB414A373DAB)
 local DrawSprite = DrawSprite
 local ClearDrawOrigin = ClearDrawOrigin
 local DoesEntityExist = DoesEntityExist
@@ -117,7 +117,7 @@ function utils.drawOption(coords, text, spriteDict, spriteName, row, width, show
     -- Citizen.InvokeNative(0xF5A2C681787E579D, (showDot == true and 0.03 or 0.018) + (width / 2), row * 0.03 - 0.015, 0.0, 0.0)
     DrawSprite(spriteDict, spriteName,(showDot == true and 0.03 or 0.018) + (width / 2), row * 0.03 - 0.015+ 0.014, width, 0.025, 0.0, 255, 255, 255, alpha)
         -- ResetScriptGfxAlign()
-        -- Citizen.InvokeNative(0xE3A3DB414A373DAB)
+        Citizen.InvokeNative(0xE3A3DB414A373DAB)
 
     if showDot then
         local newSpritename = spriteName == textures.selected and textures.select_opt or textures.unselect_opt
@@ -125,7 +125,7 @@ function utils.drawOption(coords, text, spriteDict, spriteName, row, width, show
         -- Citizen.InvokeNative(0xF5A2C681787E579D, 0.018, row * 0.03 - 0.015, 0.0, 0.0)
         DrawSprite(spriteDict, newSpritename,  0.018, row * 0.03 - 0.015+ 0.014, 0.011, 0.02, 0.0, 255, 255, 255, alpha)
             -- ResetScriptGfxAlign()
-            -- Citizen.InvokeNative(0xE3A3DB414A373DAB)
+            Citizen.InvokeNative(0xE3A3DB414A373DAB)
     end
 
     ClearDrawOrigin()

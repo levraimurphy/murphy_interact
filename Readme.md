@@ -1,12 +1,8 @@
-
-![msedge_t3YdeqKUs5](https://github.com/user-attachments/assets/57a1865f-39f4-4223-bd24-0314b1234193)
+restream les texture a la main
 
 
 # World Interactions
 Create interaction points in the world with selectable options adapted for RedM.
-
-# Original Repo
-https://github.com/darktrovx/interact
 
 # Credits
 [ChatDisabled](https://github.com/Chatdisabled)
@@ -19,6 +15,8 @@ https://github.com/darktrovx/interact
 
 # Guides & Information
 
+[Video Demo 1](https://youtu.be/dQ7Pdq1pdHQ)
+[Video Demo 2](https://youtu.be/9ZLK0kl2k94)
 
 Requires [ox_lib](https://github.com/overextended/ox_lib)
 

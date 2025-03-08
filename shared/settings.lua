@@ -6,8 +6,9 @@
 -- 5. put the name of your .ytd below under Style and enjoy !
 
 return {
+    keybind = 0x8AAA0AD4, --- ALT
     Debug = GetConvar('debug', 'false') == 'true' and true or false, -- Enable / Disable debug mode
-    Style = 'redm_native_muziq', -- redm_native_murphy or redm_native_muziq, redm_native_murphy can make people crash for unknown reason 
+    Style = 'redm_native_murphy', -- redm_native_murphy or redm_native_muziq
     Textures = { -- Do not change
         pin = 'pin',
         interact = 'interact',
