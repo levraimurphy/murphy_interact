@@ -133,6 +133,7 @@ function api.addInteraction(data)
         options = data.options,
         distance = data.distance or 10.0,
         interactDst = data.interactDst or 1.0,
+        alwaysActive = data.alwaysActive or false,
         groups = data.groups,
         resource = GetInvokingResource()
     }
@@ -147,6 +148,7 @@ function api.addInteraction(data)
 
     return id
 end
+
 exports('AddInteraction', api.addInteraction)
 
 ---@param data table : { name, entity, options, distance, interactDst, groups }
@@ -190,6 +192,7 @@ function api.addLocalEntityInteraction(data)
 
     return id
 end
+
 exports('AddLocalEntityInteraction', api.addLocalEntityInteraction)
 
 ---@param data table : { name, netId, options, distance, interactDst, groups }
@@ -197,7 +200,6 @@ exports('AddLocalEntityInteraction', api.addLocalEntityInteraction)
 -- Add an interaction point on a networked entity
 function api.addEntityInteraction(data)
     local netId = data.netId
-
     -- If the netId does not exist, we assume it is an entity
     if not netId or not NetworkDoesNetworkIdExist(netId) then
         local entity = data.entity or data.netId
@@ -210,8 +212,12 @@ function api.addEntityInteraction(data)
     end
 
     if NetworkDoesNetworkIdExist(netId) then
-        if not Entity(NetworkGetEntityFromNetworkId(netId)).state.hasInteractOptions then
-            TriggerServerEvent('interact:setEntityHasOptions', netId)
+        local ent = NetworkGetEntityFromNetworkId(netId)
+        if ent and ent ~= 0 then
+            local wrapper = Entity(ent)
+            if not wrapper.state.hasInteractOptions then
+                TriggerServerEvent('interact:setEntityHasOptions', netId)
+            end
         end
     end
 
@@ -233,6 +239,7 @@ function api.addEntityInteraction(data)
         options = data.options,
         distance = data.distance or 10.0,
         interactDst = data.interactDst or 1.0,
+        alwaysActive = data.alwaysActive or false,
         offset = data.offset,
         groups = data.groups,
         resource = GetInvokingResource()
@@ -242,10 +249,11 @@ function api.addEntityInteraction(data)
         filteredInteractions[#filteredInteractions + 1] = dataTable
     end
 
-    netInteractions[netId][#netInteractions[netId]+1] = dataTable
+    netInteractions[netId][#netInteractions[netId] + 1] = dataTable
 
     return id
 end
+
 exports('AddEntityInteraction', api.addEntityInteraction)
 
 function api.addGlobalVehicleInteraction(data)
@@ -262,6 +270,7 @@ function api.addGlobalVehicleInteraction(data)
         offset = data.offset,
         bone = data.bone,
         ignoreLos = data.ignoreLos,
+        alwaysActive = data.alwaysActive or false,
         width = utils.getOptionsWidth(data.options),
         global = true,
         groups = data.groups,
@@ -276,6 +285,7 @@ function api.addGlobalVehicleInteraction(data)
 
     return id
 end
+
 exports('AddGlobalVehicleInteraction', api.addGlobalVehicleInteraction)
 
 function api.addGlobalPlayerInteraction(data)
@@ -292,6 +302,7 @@ function api.addGlobalPlayerInteraction(data)
         offset = data.offset,
         bone = data.bone,
         ignoreLos = data.ignoreLos,
+        alwaysActive = data.alwaysActive or false,
         width = utils.getOptionsWidth(data.options),
         global = false,
         globalPlayer = true,
@@ -307,15 +318,18 @@ function api.addGlobalPlayerInteraction(data)
 
     return id
 end
+
 exports('addGlobalPlayerInteraction', api.addGlobalPlayerInteraction)
 
 
----@param data table : { name, entity[number|string], bone[string], options, distance, interactDst, groups }
----@return number | nil : The id of the interaction
--- Add an interaction point on a networked entity's bone
-function api.addEntityBoneInteraction()
-    lib.print.warn('addEntityBoneInteraction is deprecated, use AddEntityInteraction or AddLocalEntityInteraction instead')
+---@param data any
+---@return nil
+-- Add an interaction point on a networked entity's bone (deprecated)
+function api.addEntityBoneInteraction(data)
+    lib.print.warn(
+        'addEntityBoneInteraction is deprecated, use AddEntityInteraction or AddLocalEntityInteraction instead')
 end
+
 exports('AddEntityBoneInteraction', api.addEntityBoneInteraction)
 
 ---@param data table : { name, modelData table : { model[string], offset[vec3] }, options, distance, interactDst, groups }
@@ -343,6 +357,7 @@ function api.addModelInteraction(data)
         options = data.options,
         ignoreLos = data.ignoreLos,
         bone = data.bone,
+        alwaysActive = data.alwaysActive or false,
         width = data.width or utils.getOptionsWidth(data.options),
         distance = data.distance or 10,
         interactDst = data.interactDst or 1,
@@ -358,6 +373,7 @@ function api.addModelInteraction(data)
 
     return id
 end
+
 exports('AddModelInteraction', api.addModelInteraction)
 
 local function removeFilteredInteraction(interaction)
@@ -387,13 +403,15 @@ function api.removeInteraction(id)
         end
     end
 end
+
 exports('RemoveInteraction', api.removeInteraction)
 
----@param entity number : The entity to remove the interaction from
--- Remove an interaction point by entity.
-function api.removeInteractionByEntity()
+---@param entity any
+-- Remove an interaction point by entity (deprecated).
+function api.removeInteractionByEntity(entity)
     lib.print.warn('removeInteractionByEntity is deprecated, use RemoveLocalEntityInteraction instead')
 end
+
 exports('RemoveInteractionByEntity', api.removeInteractionByEntity)
 
 function api.removeLocalEntityInteraction(entity, id)
@@ -409,6 +427,7 @@ function api.removeLocalEntityInteraction(entity, id)
         end
     end
 end
+
 exports('RemoveLocalEntityInteraction', api.removeLocalEntityInteraction)
 
 function api.removeModelInteraction(model, id)
@@ -424,6 +443,7 @@ function api.removeModelInteraction(model, id)
         end
     end
 end
+
 exports('RemoveModelInteraction', api.removeModelInteraction)
 
 function api.removeEntityInteraction(netId, id)
@@ -439,6 +459,7 @@ function api.removeEntityInteraction(netId, id)
         end
     end
 end
+
 exports('RemoveEntityInteraction', api.removeEntityInteraction)
 
 RegisterNetEvent('interact:removeEntity', function(data)
@@ -446,7 +467,14 @@ RegisterNetEvent('interact:removeEntity', function(data)
         local netId = data[i]
 
         if netInteractions[netId] then
-            netInteractions[netId] = nil
+            local entity = NetworkGetEntityFromNetworkId(netId)
+            if entity and entity ~= 0 then
+                if not DoesEntityExist(entity) then
+                     netInteractions[netId] = nil
+                end
+            else
+                netInteractions[netId] = nil
+            end
         end
     end
 
@@ -466,6 +494,7 @@ function api.removeGlobalVehicleInteraction(id)
         end
     end
 end
+
 exports('RemoveGlobalVehicleInteraction', api.removeGlobalVehicleInteraction)
 
 function api.removeGlobalPlayerInteraction(id)
@@ -481,6 +510,7 @@ function api.removeGlobalPlayerInteraction(id)
         end
     end
 end
+
 exports('RemoveGlobalPlayerInteraction', api.removeGlobalPlayerInteraction)
 
 ---@param id number : The id of the interaction to remove the option from
@@ -507,6 +537,7 @@ function api.removeInteractionOption(id, name)
         end
     end
 end
+
 exports('RemoveInteractionOption', api.removeInteractionOption)
 
 ---@param id number : The id of the interaction to update
@@ -527,6 +558,7 @@ function api.updateInteraction(id, options)
         filterInteractions()
     end
 end
+
 exports('UpdateInteraction', api.updateInteraction)
 
 local function canInteract(option, interaction)
@@ -566,6 +598,7 @@ local function getReturnData(options, distance, interaction)
         curDist = distance,
         ignoreLos = interaction.ignoreLos,
         interactDst = interaction.interactDst,
+        alwaysActive = interaction.alwaysActive,
         width = interaction.width,
         offset = interaction.offset,
         serverId = interaction.serverId,
@@ -604,8 +637,9 @@ local function addGlobalPlayerData(interaction, options, playercoords)
 
 
         for j = 1, playerAmount do
+            if not players[j] then goto continue end
             interaction.entity = players[j]
-            interaction.serverId = serverIds[j]
+            interaction.serverId = serverIds and serverIds[j] or nil
             local distance = #(utils.getCoordsFromInteract(interaction) - playercoords)
 
             if distance <= interaction.distance then
@@ -616,6 +650,7 @@ local function addGlobalPlayerData(interaction, options, playercoords)
                     options[amount] = getReturnData(interactOptions, distance, interaction)
                 end
             end
+            ::continue::
         end
     end
 end
@@ -676,7 +711,6 @@ function api.getNearbyInteractions()
             -- Check if the interaction is a networked entity
             if interaction.netId then
                 local entity = entities.isNetIdNearby(interaction.netId)
-
                 if not entity then
                     goto skip
                 end
@@ -713,6 +747,7 @@ end
 function api.disable(state)
     LocalPlayer.state:set('interactionsDisabled', state, false)
 end
+
 exports('Disable', api.disable)
 
 AddEventHandler('onClientResourceStop', function(resource)

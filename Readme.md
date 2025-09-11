@@ -49,6 +49,18 @@ Server Events
 
 ```
 
+# How to always show an interaction
+Use alwaysActive value set to true like so:
+```lua
+ {
+    label = 'Hello World!',
+    alwaysActive  = true,
+    action = function(entity, coords, args)
+        print(entity, coords, json.encode(args))
+    end,
+ }
+
+```
 # Exports
 ```lua
 -- Add an interaction point at a set of coords
