@@ -130,18 +130,17 @@ RegisterNetEvent('onPlayerDropped', function(serverId)
 end)
 
 RegisterNetEvent('onPlayerJoining', function(serverId)
-    local playerId = GetPlayerFromServerId(serverId)
-
-    local ent = lib.waitFor(function()
-        local ped = GetPlayerPed(playerId)
-
-        if ped > 0 then
-            return ped
-        end
-    end, '', 10000)
-
+    local ped
+    local attempt = 0
+    repeat
+        Wait(1000)
+        attempt = attempt + 1
+        local playerId = GetPlayerFromServerId(serverId)
+        ped = GetPlayerPed(playerId)
+    until ped > 0 or attempt > 60
+    if ped <= 0 then print ("Failed to find player ped after " .. attempt .. " seconds") return end
     playersTable[serverId] = {
-        entity = ent,
+        entity = ped,
         serverId = serverId,
         type = 'players',
     }
