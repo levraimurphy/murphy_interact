@@ -113,7 +113,7 @@ end
 
 CreateThread(function()
     while true do
-        local playerCoords = GetEntityCoords(cache.ped)
+        local playerCoords = GetEntityCoords(PlayerPedId())
 
         clearTables()
 

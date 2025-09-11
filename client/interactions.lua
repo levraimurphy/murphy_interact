@@ -682,7 +682,7 @@ function api.getNearbyInteractions()
     local options = {}
     local amount = 0
 
-    local playercoords = GetEntityCoords(cache.ped)
+    local playercoords = GetEntityCoords(PlayerPedId())
 
     local amountOfInteractions = #filteredInteractions
 

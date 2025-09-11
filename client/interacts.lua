@@ -164,7 +164,7 @@ local function isDisabled()
         return true
     end
 
-    if settings.Disable.onDeath and (IsPedDeadOrDying(cache.ped) or playerState.isDead) then
+    if settings.Disable.onDeath and (IsPedDeadOrDying(PlayerPedId()) or playerState.isDead) then
         return true
     end
 
@@ -176,7 +176,7 @@ local function isDisabled()
         return true
     end
 
-    if settings.Disable.onHandCuff and IsPedCuffed(cache.ped) then
+    if settings.Disable.onHandCuff and IsPedCuffed(PlayerPedId()) then
         return true
     end
 

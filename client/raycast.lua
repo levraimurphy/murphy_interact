@@ -11,7 +11,7 @@ function rayCast(origin, target, options, ignoreEntity, radius)
 end
 
 function entityInFrontOfPlayer(distance, radius, ignoreEntity)
-    local originCoords = GetPedBoneCoords(cache.ped, 21030, 0, 0, 0)
+    local originCoords = GetPedBoneCoords(PlayerPedId(), 21030, 0, 0, 0)
     local forwardVectors = getForwardVector(GetGameplayCamRot(2))
     local forwardCoords = originCoords + (forwardVectors * (distance or 3.0))
 
@@ -27,7 +27,7 @@ end
 function getCurrentTarget()
     local entity, entityType
     pcall(function()
-        entity, entityType = entityInFrontOfPlayer(3.0, 0.7, cache.ped)
+        entity, entityType = entityInFrontOfPlayer(3.0, 0.7, PlayerPedId())
     end)
 
     return entity and entityType ~= 0 and entity or nil

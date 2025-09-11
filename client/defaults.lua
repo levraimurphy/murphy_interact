@@ -23,7 +23,7 @@ api.addGlobalVehicleInteraction({
             local plate = GetVehicleNumberPlateText(entity)
             local coords = GetEntityCoords(entity)
 
-            TaskTurnPedToFaceCoord(cache.ped, coords.x, coords.y, coords.z, 0)
+            TaskTurnPedToFaceCoord(PlayerPedId(), coords.x, coords.y, coords.z, 0)
 
             if not exports.ox_inventory:openInventory('trunk', { id = ('trunk%s'):format(plate), netid = NetworkGetNetworkIdFromEntity(entity), entityid = entity, door = 5 }) then return end
         end,
