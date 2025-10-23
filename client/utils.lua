@@ -99,7 +99,7 @@ end
 function DrawText3D(coords, text, alpha, row, width, showDot)
         local onScreen, _x, _y = GetScreenCoordFromWorldCoord(coords.x, coords.y, coords.z)
         SetTextScale(0.0, 0.25)
-        SetTextFontForCurrentCommand(1)
+        SetTextFontForCurrentCommand(9)
         SetTextColor(250, 250, 250, alpha)
         local str = Citizen.InvokeNative(0xFA925AC00EB830B9, 10, "LITERAL_STRING", text, Citizen.ResultAsLong())
         SetTextCentre(1)
@@ -128,6 +128,27 @@ function utils.drawOption(coords, text, spriteDict, spriteName, row, width, show
             Citizen.InvokeNative(0xE3A3DB414A373DAB)
     end
 
+    ClearDrawOrigin()
+end
+
+function utils.drawTitle(coords, title, alpha, width)
+    ClearDrawOrigin()
+    SetDrawOrigin(coords.x, coords.y, coords.z, 0)
+    
+    local onScreen, _x, _y = GetScreenCoordFromWorldCoord(coords.x, coords.y, coords.z)
+    SetTextScale(0.0, 0.28)
+    SetTextFontForCurrentCommand(1)
+    Citizen.InvokeNative(0x50A41AD966910F03, 255, 255, 255, alpha) -- SetTextColor
+    local str = Citizen.InvokeNative(0xFA925AC00EB830B9, 10, "LITERAL_STRING", title, Citizen.ResultAsLong())
+    Citizen.InvokeNative(0xAE4E8157D9ECF087, 1) -- SetTextCentre true (centré)
+    
+    -- Position au-dessus des options
+    -- La première option est à row = 0, donc le titre sera à row = -1
+    local xPos = -0.01 + (width / 2)
+    local yPos = -0.04 -- Ajusté pour être juste au-dessus de la première option
+    
+    Citizen.InvokeNative(0xD79334A4BB99BAD1, str, xPos, yPos) -- DisplayText
+    Citizen.InvokeNative(0xE3A3DB414A373DAB)
     ClearDrawOrigin()
 end
 

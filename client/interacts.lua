@@ -86,8 +86,14 @@ local function CreateInteractions(keypressed)
                         SetScriptGfxDrawOrder(4)
                         -- Citizen.InvokeNative(0xE3A3DB414A373DAB)
                         Citizen.InvokeNative(0xE3A3DB414A373DAB)
+                        
                         local optionAmount = #options
                         local showDot = optionAmount > 1
+                        
+                        -- Draw title if present (au-dessus des options)
+                        if interaction.title then
+                            utils.drawTitle(coords, interaction.title, alpha, interaction.width, showDot)
+                        end
 
                         for j = 1, optionAmount do
                             createOption(coords, options[j], j, interaction.width, showDot, alpha)

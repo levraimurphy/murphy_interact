@@ -135,6 +135,7 @@ function api.addInteraction(data)
         interactDst = data.interactDst or 1.0,
         alwaysActive = data.alwaysActive or false,
         groups = data.groups,
+        title = data.title,
         resource = GetInvokingResource()
     }
 
@@ -181,6 +182,7 @@ function api.addLocalEntityInteraction(data)
         interactDst = data.interactDst or 1.0,
         offset = data.offset,
         groups = data.groups,
+        title = data.title,
         resource = GetInvokingResource()
     }
 
@@ -242,6 +244,7 @@ function api.addEntityInteraction(data)
         alwaysActive = data.alwaysActive or false,
         offset = data.offset,
         groups = data.groups,
+        title = data.title,
         resource = GetInvokingResource()
     }
 
@@ -274,6 +277,7 @@ function api.addGlobalVehicleInteraction(data)
         width = utils.getOptionsWidth(data.options),
         global = true,
         groups = data.groups,
+        title = data.title,
         resource = GetInvokingResource()
     }
 
@@ -307,6 +311,7 @@ function api.addGlobalPlayerInteraction(data)
         global = false,
         globalPlayer = true,
         groups = data.groups,
+        title = data.title,
         resource = GetInvokingResource()
     }
 
@@ -362,6 +367,7 @@ function api.addModelInteraction(data)
         distance = data.distance or 10,
         interactDst = data.interactDst or 1,
         groups = data.groups,
+        title = data.title,
         resource = GetInvokingResource(),
     }
 
@@ -602,6 +608,7 @@ local function getReturnData(options, distance, interaction)
         width = interaction.width,
         offset = interaction.offset,
         serverId = interaction.serverId,
+        title = interaction.title,
     }
 end
 
