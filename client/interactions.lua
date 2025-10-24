@@ -9,7 +9,7 @@ local table_type = table.type
 -- CACHE.
 local api = {}
 local entityInteractions = {}
-local modelInteractions = {}
+Modelinteractions = {}
 local netInteractions = {}
 local globalVehicleInteractions = {}
 local globalPlayerInteraction = {}
@@ -101,7 +101,7 @@ local function filterInteractions()
     -- All of these are essentially the same, data structure so we can use the same function
     filterEntityInteractions(newInteractions, netInteractions)
     filterEntityInteractions(newInteractions, entityInteractions)
-    filterEntityInteractions(newInteractions, modelInteractions)
+    filterEntityInteractions(newInteractions, Modelinteractions)
 
     -- Filter out the other interactions that are not local/net entitiy interactions
     filterOtherInteractions(newInteractions, interactions)
@@ -151,6 +151,75 @@ function api.addInteraction(data)
 end
 
 exports('AddInteraction', api.addInteraction)
+
+function api.AddOption(id, option)
+    if not id or not option then
+        print('Invalid id or option for AddOption')
+        return
+    end
+
+    local idFound = false
+
+    for i, interaction in ipairs(interactions) do
+        if interaction.id == id then
+            table.insert(interaction.options, option)
+            interaction.width = utils.getOptionsWidth(interaction.options)
+            return
+        end
+    end
+
+    for _, data in pairs(entityInteractions) do
+        for i, interaction in ipairs(data) do
+            if interaction.id == id then
+                table.insert(interaction.options, option)
+                interaction.width = utils.getOptionsWidth(interaction.options)
+                return
+            end
+        end
+    end
+
+    for _, data in pairs(Modelinteractions) do
+        for i, interaction in ipairs(data) do
+            if interaction.id == id then
+                table.insert(interaction.options, option)
+                interaction.width = utils.getOptionsWidth(interaction.options)
+                return
+            end
+        end
+    end
+
+    for _, data in pairs(netInteractions) do
+        for i, interaction in ipairs(data) do
+            if interaction.id == id then
+                table.insert(interaction.options, option)
+                interaction.width = utils.getOptionsWidth(interaction.options)
+                return
+            end
+        end
+    end
+
+    for i, interaction in ipairs(globalVehicleInteractions) do
+        if interaction.id == id then
+            table.insert(interaction.options, option)
+            interaction.width = utils.getOptionsWidth(interaction.options)
+            return
+        end
+    end
+
+    for i, interaction in ipairs(globalPlayerInteraction) do
+        if interaction.id == id then
+            table.insert(interaction.options, option)
+            interaction.width = utils.getOptionsWidth(interaction.options)
+            return
+        end
+    end
+
+    if not idFound then
+        print('No interaction found with id: ' .. id)
+    end
+end
+
+exports('AddOption', api.AddOption)
 
 ---@param data table : { name, entity, options, distance, interactDst, groups }
 ---@return string | nil : The id of the interaction
@@ -349,8 +418,8 @@ function api.addModelInteraction(data)
         return
     end
 
-    if not modelInteractions[model] then
-        modelInteractions[model] = {}
+    if not Modelinteractions[model] then
+        Modelinteractions[model] = {}
     end
 
     local id = data.id or generateUUID()
@@ -375,7 +444,7 @@ function api.addModelInteraction(data)
         filteredInteractions[#filteredInteractions + 1] = tableData
     end
 
-    modelInteractions[model][#modelInteractions[model] + 1] = tableData
+    Modelinteractions[model][#Modelinteractions[model] + 1] = tableData
 
     return id
 end
@@ -437,9 +506,9 @@ end
 exports('RemoveLocalEntityInteraction', api.removeLocalEntityInteraction)
 
 function api.removeModelInteraction(model, id)
-    if model and id and modelInteractions[model] then
-        for i = 1, #modelInteractions[model] do
-            local interaction = modelInteractions[model][i]
+    if model and id and Modelinteractions[model] then
+        for i = 1, #Modelinteractions[model] do
+            local interaction = Modelinteractions[model][i]
 
             if interaction.id == id then
                 removeFilteredInteraction(interaction)
@@ -792,11 +861,11 @@ AddEventHandler('onClientResourceStop', function(resource)
         end
     end
 
-    for model, data in pairs(modelInteractions) do
+    for model, data in pairs(Modelinteractions) do
         for i = #data, 1, -1 do
             local interaction = data[i]
             if interaction.resource == resource then
-                table.remove(modelInteractions[model], i)
+                table.remove(Modelinteractions[model], i)
             end
         end
     end
