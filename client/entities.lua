@@ -7,6 +7,15 @@ local playersTable = {}
 -- Sub caches are used for caching shit that is run every 250ms in the main loop
 local subCache = {}
 
+-- Pool need flags — updated by interactions module
+local poolNeeds = { vehicles = false, peds = false, objects = false }
+
+function entities.updatePoolNeeds(vehicles, peds, objects)
+    poolNeeds.vehicles = vehicles
+    poolNeeds.peds = peds
+    poolNeeds.objects = objects
+end
+
 function entities.isNetIdNearby(netID)
     local entity = netIds[netID]
 
@@ -78,7 +87,7 @@ local function buildEntities(eType, playerCoords)
     for i = 1, #entityPool do
         local entity = entityPool[i]
 
-        if #(playerCoords - GetEntityCoords(entity)) < 100.0 then
+        if #(playerCoords - GetEntityCoords(entity)) < 50.0 then
             local isNetworked = NetworkGetEntityIsNetworked(entity)
             local model = GetEntityModel(entity)
 
@@ -113,13 +122,13 @@ end
 
 CreateThread(function()
     while true do
-        local playerCoords = GetEntityCoords(PlayerPedId())
+        local playerCoords = GetEntityCoords(cache.ped)
 
         clearTables()
 
-        buildEntities('CVehicle', playerCoords)
-        buildEntities('CPed', playerCoords)
-        buildEntities('CObject', playerCoords)
+        if poolNeeds.vehicles then buildEntities('CVehicle', playerCoords) end
+        if poolNeeds.peds then buildEntities('CPed', playerCoords) end
+        if poolNeeds.objects then buildEntities('CObject', playerCoords) end
 
         Wait(2500)
     end
@@ -130,17 +139,18 @@ RegisterNetEvent('onPlayerDropped', function(serverId)
 end)
 
 RegisterNetEvent('onPlayerJoining', function(serverId)
-    local ped
-    local attempt = 0
-    repeat
-        Wait(1000)
-        attempt = attempt + 1
-        local playerId = GetPlayerFromServerId(serverId)
-        ped = GetPlayerPed(playerId)
-    until ped > 0 or attempt > 60
-    if ped <= 0 then print ("Failed to find player ped after " .. attempt .. " seconds") return end
+    local playerId = GetPlayerFromServerId(serverId)
+
+    local ent = lib.waitFor(function()
+        local ped = GetPlayerPed(playerId)
+
+        if ped > 0 then
+            return ped
+        end
+    end, '', 10000)
+
     playersTable[serverId] = {
-        entity = ped,
+        entity = ent,
         serverId = serverId,
         type = 'players',
     }

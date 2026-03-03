@@ -49,18 +49,6 @@ Server Events
 
 ```
 
-# How to always show an interaction
-Use alwaysActive value set to true like so:
-```lua
- {
-    label = 'Hello World!',
-    alwaysActive  = true,
-    action = function(entity, coords, args)
-        print(entity, coords, json.encode(args))
-    end,
- }
-
-```
 # Exports
 ```lua
 -- Add an interaction point at a set of coords
@@ -70,7 +58,6 @@ exports.murphy_interact:AddInteraction({
     interactDst = 1.0, -- optional
     id = 'myCoolUniqueId', -- needed for removing interactions
     name = 'interactionName', -- optional
-    title = 'My Title', -- optional, displays to the left of the pin when options are visible
     groups = {
         ['police'] = 2, -- Jobname | Job grade
     },
@@ -93,7 +80,6 @@ exports.murphy_interact:AddLocalEntityInteraction({
     ignoreLos = false, -- optional ignores line of sight
     offset = vec3(0.0, 0.0, 0.0), -- optional
     bone = 'engine', -- optional
-    title = 'My Title', -- optional, displays to the left of the pin when options are visible
     groups = {
         ['police'] = 2, -- Jobname | Job grade
     },
@@ -117,7 +103,6 @@ exports.murphy_interact:AddEntityInteraction({
     ignoreLos = false, -- optional ignores line of sight
     offset = vec3(0.0, 0.0, 0.0), -- optional
     bone = 'engine', -- optional
-    title = 'My Title', -- optional, displays to the left of the pin when options are visible
     groups = {
         ['police'] = 2, -- Jobname | Job grade
     },
@@ -138,7 +123,6 @@ exports.murphy_interact:AddGlobalVehicleInteraction({
     interactDst = 1.0, -- optional
     offset = vec3(0.0, 0.0, 0.0), -- optional
     bone = 'engine', -- optional
-    title = 'My Title', -- optional, displays to the left of the pin when options are visible
     groups = {
         ['police'] = 2, -- Jobname | Job grade
     },
@@ -162,7 +146,6 @@ exports.murphy_interact:AddModelInteraction({
     id = 'myCoolUniqueId', -- needed for removing interactions
     distance = 8.0, -- optional
     interactDst = 1.0, -- optional
-    title = 'My Title', -- optional, displays to the left of the pin when options are visible
     groups = {
         ['police'] = 2, -- Jobname | Job grade
     },
@@ -184,7 +167,6 @@ exports.murphy_interact:addGlobalPlayerInteraction({
     interactDst = 1.5,
     offset = vec3(0.0, 0.0, 0.0),
     id = 'interact:actionPlayer',
-    title = 'My Title', -- optional, displays to the left of the pin when options are visible
     options = {
         name = 'interact:actionPlayer',
         label = 'Do Action On Player',
