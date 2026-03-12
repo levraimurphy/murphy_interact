@@ -176,6 +176,14 @@ exports.murphy_interact:addGlobalPlayerInteraction({
     }
 })
 
+-- Add an option to an existing interaction by id
+exports.murphy_interact:AddOption('myCoolUniqueId', {
+    label = 'New Option',
+    action = function(entity, coords, args)
+        print(entity, coords, json.encode(args))
+    end,
+})
+
 ---@param id number : The id of the interaction to remove
 -- Remove an interaction point by id.
 exports.murphy_interact:RemoveInteraction(interactionID)
