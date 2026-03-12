@@ -3,9 +3,30 @@ local netIds = {}
 local models = {}
 local localEnties = {}
 local playersTable = {}
+local interestingModels = {}
+local lastPlayerPosition
 
 -- Sub caches are used for caching shit that is run every 250ms in the main loop
 local subCache = {}
+
+local startTime = GetGameTimer()
+local duration = 5 * 60 * 1000
+
+Citizen.CreateThread(function()
+    while true do
+        local currentTime = GetGameTimer()
+        local elapsedTime = currentTime - startTime
+
+        for modelHash, _ in pairs(Modelinteractions) do
+            table.insert(interestingModels, modelHash)
+        end
+
+        if elapsedTime >= duration then
+            break
+        end
+        Citizen.Wait(1000)
+    end
+end)
 
 -- Pool need flags — updated by interactions module
 local poolNeeds = { vehicles = false, peds = false, objects = false }
@@ -56,10 +77,11 @@ function entities.getEntitiesByType(type)
     if type == 'players' then
         for _, v in pairs(playersTable) do
             amount += 1
-            entityTable[amount] = v.entity
-            serverIds[amount] = v.serverId
+            if DoesEntityExist(v.entity) then
+                entityTable[amount] = v.entity
+                serverIds[amount] = v.serverId
+            end
         end
-
         return amount, entityTable, serverIds
     end
 
@@ -79,10 +101,18 @@ local NetworkGetNetworkIdFromEntity = NetworkGetNetworkIdFromEntity
 local NetworkGetEntityIsNetworked = NetworkGetEntityIsNetworked
 local GetEntityModel = GetEntityModel
 
-local function buildEntities(eType, playerCoords)
-    local entityPool = GetGamePool(eType)
+local function buildEntities(entityType, playerCoords)
+    local entityPool = {}
+    local type       = entityType:sub(2):lower()
 
-    local type = eType:sub(2):lower()
+    if entityType == 'CObject' then
+        entityPool = GetEntitiesInRadius(playerCoords.x, playerCoords.y, playerCoords.z, 30.0, 3, true,
+            interestingModels)
+    elseif entityType == 'CVehicle' then
+        entityPool = GetEntitiesInRadius(playerCoords.x, playerCoords.y, playerCoords.z, 30.0, 2, true, nil)
+    elseif entityType == 'CPed' then
+        entityPool = GetEntitiesInRadius(playerCoords.x, playerCoords.y, playerCoords.z, 30.0, 1, true, nil)
+    end
 
     for i = 1, #entityPool do
         local entity = entityPool[i]
