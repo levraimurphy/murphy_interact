@@ -76,9 +76,10 @@ function entities.getEntitiesByType(type)
 
     if type == 'players' then
         for _, v in pairs(playersTable) do
-            amount += 1
-            if DoesEntityExist(v.entity) then
-                entityTable[amount] = v.entity
+            local ped = GetPlayerPed(GetPlayerFromServerId(v.serverId))
+            if ped > 0 and DoesEntityExist(ped) then
+                amount += 1
+                entityTable[amount] = ped
                 serverIds[amount] = v.serverId
             end
         end
@@ -169,18 +170,7 @@ RegisterNetEvent('onPlayerDropped', function(serverId)
 end)
 
 RegisterNetEvent('onPlayerJoining', function(serverId)
-    local playerId = GetPlayerFromServerId(serverId)
-
-    local ent = lib.waitFor(function()
-        local ped = GetPlayerPed(playerId)
-
-        if ped > 0 then
-            return ped
-        end
-    end, '', 10000)
-
     playersTable[serverId] = {
-        entity = ent,
         serverId = serverId,
         type = 'players',
     }
@@ -196,16 +186,7 @@ AddEventHandler('onResourceStart', function(resource)
         local serverId = GetPlayerServerId(playerId)
 
         if serverId ~= cache.serverId then
-            local ent = lib.waitFor(function()
-                local ped = GetPlayerPed(playerId)
-
-                if ped > 0 then
-                    return ped
-                end
-            end, '', 10000)
-
             playersTable[serverId] = {
-                entity = ent,
                 serverId = serverId,
                 type = 'players',
             }
