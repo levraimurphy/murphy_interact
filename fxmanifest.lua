@@ -32,7 +32,6 @@ client_scripts {
     'client/textures.lua',
     'client/interacts.lua',
     'client/raycast.lua',
-    'client/defaults.lua',
 }
 
 server_scripts {
