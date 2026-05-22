@@ -147,6 +147,7 @@ function api.addInteraction(data)
         options = data.options,
         distance = data.distance or 10.0,
         interactDst = data.interactDst or 1.0,
+        alwaysActive = data.alwaysActive or false,
         groups = data.groups,
         resource = GetInvokingResource()
     }
@@ -260,6 +261,7 @@ function api.addLocalEntityInteraction(data)
         ignoreLos = data.ignoreLos,
         distance = data.distance or 8.0,
         interactDst = data.interactDst or 1.0,
+        alwaysActive = data.alwaysActive or false,
         offset = data.offset,
         groups = data.groups,
         resource = GetInvokingResource()
@@ -319,6 +321,7 @@ function api.addEntityInteraction(data)
         options = data.options,
         distance = data.distance or 10.0,
         interactDst = data.interactDst or 1.0,
+        alwaysActive = data.alwaysActive or false,
         offset = data.offset,
         groups = data.groups,
         resource = GetInvokingResource()
@@ -351,6 +354,7 @@ function api.addGlobalVehicleInteraction(data)
         offset = data.offset,
         bone = data.bone,
         ignoreLos = data.ignoreLos,
+        alwaysActive = data.alwaysActive or false,
         width = utils.getOptionsWidth(data.options),
         global = true,
         groups = data.groups,
@@ -384,6 +388,7 @@ function api.addGlobalPlayerInteraction(data)
         offset = data.offset,
         bone = data.bone,
         ignoreLos = data.ignoreLos,
+        alwaysActive = data.alwaysActive or false,
         width = utils.getOptionsWidth(data.options),
         global = false,
         globalPlayer = true,
@@ -435,6 +440,7 @@ function api.addModelInteraction(data)
         options = data.options,
         ignoreLos = data.ignoreLos,
         bone = data.bone,
+        alwaysActive = data.alwaysActive or false,
         width = data.width or utils.getOptionsWidth(data.options),
         distance = data.distance or 10,
         interactDst = data.interactDst or 1,
@@ -671,6 +677,7 @@ local function getReturnData(options, distance, interaction)
         curDist = distance,
         ignoreLos = interaction.ignoreLos,
         interactDst = interaction.interactDst,
+        alwaysActive = interaction.alwaysActive,
         width = interaction.width,
         offset = interaction.offset,
         serverId = interaction.serverId,

@@ -27,6 +27,23 @@ Client Events
 Server Events
 ```
 
+# How to always show an interaction
+Use `alwaysActive = true` on the interaction definition (not on options) to display it without holding the activation key:
+```lua
+exports.murphy_interact:AddInteraction({
+    coords = vec3(0.0, 0.0, 0.0),
+    alwaysActive = true,
+    options = {
+        {
+            label = 'Hello World!',
+            action = function(entity, coords, args)
+                print(entity, coords, json.encode(args))
+            end,
+        },
+    }
+})
+```
+
 # Options Format
 
 ```lua

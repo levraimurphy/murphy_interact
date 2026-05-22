@@ -47,11 +47,11 @@ local nearby, nearbyAmount = {}, 0
 --     return true
 -- end
 
-local function CreateInteractions()
+local function CreateInteractions(keypressed)
     for i = 1, nearbyAmount do
         local interaction = nearby[i]
 
-        if interaction then
+        if interaction and (interaction.alwaysActive or keypressed) then
             local coords = interaction.coords or utils.getCoordsFromInteract(interaction)
             local isPrimary = i == 1
 
@@ -188,8 +188,8 @@ CreateThread(function ()
                     DisableControlAction(0, 0xCBDB82A8, true) --- 	INPUT_HORSE_EXIT
                     DisableControlAction(0, 0xFEFAB9B4, true) --- 	INPUT_VEH_EXIT
                     DisableControlAction(0, 0xCEFD9220, true) --- INPUT_ENTER
-                    CreateInteractions()
                 end
+                CreateInteractions(showinteraction)
             else
                 wait = 500
             end
