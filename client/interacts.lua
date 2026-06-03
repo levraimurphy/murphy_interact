@@ -75,8 +75,14 @@ local function CreateInteractions(keypressed)
                     local options = interaction.options
                     local alpha = currentAlpha * -1
 
+                    -- Disables scoped to "wheel options drawn" so a quick tap of E still mounts / enters / exits.
+                    DisableControlAction(0, 0x018C47CF, true) --- INPUT_MELEE_GRAPPLE_CHOKE
+                    DisableControlAction(0, 0xCBDB82A8, true) --- INPUT_HORSE_EXIT
+                    DisableControlAction(0, 0xFEFAB9B4, true) --- INPUT_VEH_EXIT
+                    DisableControlAction(0, 0xCEFD9220, true) --- INPUT_ENTER
+
                     -- Citizen.InvokeNative(0xF5A2C681787E579D, 0.0, 0.0, 0.0, 0.0)
-                    
+
                     SetDrawOrigin(coords.x, coords.y, coords.z)
                     DrawSprite(settings.Style, interact, 0, 0, 0.0185, 0.03333333333333333, 0, 255, 255, 255, IsNightTime() and 200 or alpha)
                     Citizen.InvokeNative(0xE3A3DB414A373DAB)
@@ -173,21 +179,21 @@ CreateThread(function ()
 
             if nearbyAmount > 0 and not disableInteraction then
                 wait = 0
-                if IsControlPressed(0, 0x8AAA0AD4) then
+                -- [Mercure] Backup raw key (Win32 VK_E = 0x45) au cas où le
+                -- mapping du control INPUT_INTERACT_LOCK_TARGET serait perturbé
+                -- ou remappé hors de E par un autre script.
+                if IsControlPressed(0, 0x8AAA0AD4) or IsRawKeyPressed(0x45) then
                     showinteraction = true
                 else
                     showinteraction = false
                 end
                 if showinteraction then
-                    DisableControlAction(0, 0xFD0F0C2C, true) --- 	INPUT_NEXT_WEAPON
-                    DisableControlAction(0, 0xCC1075A7, true) --- 	INPUT_PREV_WEAPON
-                    DisableControlAction(0, 0x018C47CF, true) --- INPUT_MELEE_GRAPPLE_CHOKE
+                    -- Mount/enter/exit disables (INPUT_ENTER, HORSE_EXIT, VEH_EXIT,
+                    -- GRAPPLE_CHOKE) moved into CreateInteractions (alpha < 0 branch).
+                    DisableControlAction(0, 0xFD0F0C2C, true) --- INPUT_NEXT_WEAPON
+                    DisableControlAction(0, 0xCC1075A7, true) --- INPUT_PREV_WEAPON
                     DisableControlAction(0, 0x2277FAE9, true) --- INPUT_MELEE_GRAPPLE
                     DisableControlAction(0, 0x2EAB0795, true) --- INPUT_DYNAMIC_SCENARIO
-
-                    DisableControlAction(0, 0xCBDB82A8, true) --- 	INPUT_HORSE_EXIT
-                    DisableControlAction(0, 0xFEFAB9B4, true) --- 	INPUT_VEH_EXIT
-                    DisableControlAction(0, 0xCEFD9220, true) --- INPUT_ENTER
                 end
                 CreateInteractions(showinteraction)
             else

@@ -76,11 +76,13 @@ function entities.getEntitiesByType(type)
 
     if type == 'players' then
         for _, v in pairs(playersTable) do
-            local ped = GetPlayerPed(GetPlayerFromServerId(v.serverId))
-            if ped > 0 and DoesEntityExist(ped) then
-                amount += 1
-                entityTable[amount] = ped
-                serverIds[amount] = v.serverId
+            if v.serverId ~= cache.serverId then
+                local ped = GetPlayerPed(GetPlayerFromServerId(v.serverId))
+                if ped > 0 and DoesEntityExist(ped) then
+                    amount += 1
+                    entityTable[amount] = ped
+                    serverIds[amount] = v.serverId
+                end
             end
         end
         return amount, entityTable, serverIds
@@ -170,6 +172,8 @@ RegisterNetEvent('onPlayerDropped', function(serverId)
 end)
 
 RegisterNetEvent('onPlayerJoining', function(serverId)
+    if serverId == cache.serverId then return end
+
     playersTable[serverId] = {
         serverId = serverId,
         type = 'players',

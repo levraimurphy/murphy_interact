@@ -817,6 +817,40 @@ function api.getNearbyInteractions()
         table.sort(options, function(a, b)
             return a.curDist < b.curDist
         end)
+
+        -- Merge entries that share the same target (same entity+bone, or same coords).
+        -- Without this, two resources registering an interaction on the same entity
+        -- produce two separate popups and only the closest one shows its options,
+        -- giving the illusion that the second registration "overwrites" the first.
+        local merged, mergedAmount = {}, 0
+        local seen = {}
+        for i = 1, amount do
+            local entry = options[i]
+            local key
+            if entry.entity and entry.entity ~= 0 then
+                key = ('e:%s|%s'):format(entry.entity, entry.bone or '')
+            elseif entry.coords then
+                key = ('c:%.2f|%.2f|%.2f'):format(entry.coords.x, entry.coords.y, entry.coords.z)
+            end
+
+            local existing = key and seen[key]
+            if existing then
+                local existingOptions = existing.options
+                local base = #existingOptions
+                for j = 1, #entry.options do
+                    existingOptions[base + j] = entry.options[j]
+                end
+                if entry.width and (not existing.width or entry.width > existing.width) then
+                    existing.width = entry.width
+                end
+            else
+                mergedAmount += 1
+                merged[mergedAmount] = entry
+                if key then seen[key] = entry end
+            end
+        end
+
+        options, amount = merged, mergedAmount
     end
 
     return options, amount
