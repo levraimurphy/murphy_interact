@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 use_experimental_fxv2_oal 'yes'
 lua54 'yes'
 
-version '1.1.4'
+version '1.1.5'
 name 'interact'
 author 'darktrovx, chatdisabled, fjamzoo, pushkart2, levraimurphy'
 description 'Interaction system'
@@ -32,6 +32,7 @@ client_scripts {
     'client/textures.lua',
     'client/interacts.lua',
     'client/raycast.lua',
+    'client/defaults.lua',
 }
 
 server_scripts {

@@ -75,11 +75,17 @@ local function CreateInteractions(keypressed)
                     local options = interaction.options
                     local alpha = currentAlpha * -1
 
-                    -- Disables scoped to "wheel options drawn" so a quick tap of E still mounts / enters / exits.
-                    DisableControlAction(0, 0x018C47CF, true) --- INPUT_MELEE_GRAPPLE_CHOKE
+                    -- Mount/enter/exit scoped to "wheel options drawn" so a quick tap of E still mounts / enters / exits.
+                    -- INPUT_DYNAMIC_SCENARIO is also E in RDR2 (used for dynamic scenarios like
+                    -- mounting horses), so it MUST stay scoped to alpha<0 — otherwise the
+                    -- player can't mount a horse parked in the stable spawn zone.
+                    -- INPUT_MELEE_GRAPPLE_CHOKE moved up into the hold-E thread (line ~196) so
+                    -- a quick tap of E near another player can no longer initiate a lockon
+                    -- choke before the wheel finishes fading in.
                     DisableControlAction(0, 0xCBDB82A8, true) --- INPUT_HORSE_EXIT
                     DisableControlAction(0, 0xFEFAB9B4, true) --- INPUT_VEH_EXIT
                     DisableControlAction(0, 0xCEFD9220, true) --- INPUT_ENTER
+                    DisableControlAction(0, 0x2EAB0795, true) --- INPUT_DYNAMIC_SCENARIO (E)
 
                     -- Citizen.InvokeNative(0xF5A2C681787E579D, 0.0, 0.0, 0.0, 0.0)
 
@@ -179,21 +185,51 @@ CreateThread(function ()
 
             if nearbyAmount > 0 and not disableInteraction then
                 wait = 0
-                -- [Mercure] Backup raw key (Win32 VK_E = 0x45) au cas où le
-                -- mapping du control INPUT_INTERACT_LOCK_TARGET serait perturbé
-                -- ou remappé hors de E par un autre script.
+                -- Backup raw key (Win32 VK_E = 0x45) in case the
+                -- INPUT_INTERACT_LOCK_TARGET control mapping gets disturbed
+                -- or remapped away from E by another script.
                 if IsControlPressed(0, 0x8AAA0AD4) or IsRawKeyPressed(0x45) then
                     showinteraction = true
                 else
                     showinteraction = false
                 end
+
+                -- An alwaysActive interaction draws its wheel WITHOUT holding E
+                -- (see CreateInteractions: `interaction.alwaysActive or keypressed`).
+                -- The grapple/choke below must be blocked in that case too, otherwise
+                -- a player could still lockon-choke someone while an alwaysActive
+                -- interaction is displayed (user-reported 2026-06-03).
+                local hasAlwaysActive = false
+                if not showinteraction then
+                    for i = 1, nearbyAmount do
+                        local it = nearby[i]
+                        if it and it.alwaysActive then
+                            hasAlwaysActive = true
+                            break
+                        end
+                    end
+                end
+
                 if showinteraction then
                     -- Mount/enter/exit disables (INPUT_ENTER, HORSE_EXIT, VEH_EXIT,
-                    -- GRAPPLE_CHOKE) moved into CreateInteractions (alpha < 0 branch).
+                    -- INPUT_DYNAMIC_SCENARIO) moved into CreateInteractions (alpha < 0
+                    -- branch) so a quick tap of E still mounts / enters / exits. The
+                    -- mount control in RDR2 is INPUT_DYNAMIC_SCENARIO, so leaving it
+                    -- here prevented players from mounting a horse parked inside the
+                    -- stable spawn zone (user-reported 2026-05-27).
+                    -- GRAPPLE_CHOKE is disabled here (every hold-E frame) so a quick
+                    -- tap of E near another player can never start a choke — the
+                    -- fade-in window of the wheel used to leave a gap where the
+                    -- lockon choke would trigger.
                     DisableControlAction(0, 0xFD0F0C2C, true) --- INPUT_NEXT_WEAPON
                     DisableControlAction(0, 0xCC1075A7, true) --- INPUT_PREV_WEAPON
+                end
+
+                -- Grapple/choke is blocked whenever a wheel is on screen: either the
+                -- player is holding E, or a nearby interaction is alwaysActive.
+                if showinteraction or hasAlwaysActive then
                     DisableControlAction(0, 0x2277FAE9, true) --- INPUT_MELEE_GRAPPLE
-                    DisableControlAction(0, 0x2EAB0795, true) --- INPUT_DYNAMIC_SCENARIO
+                    DisableControlAction(0, 0x018C47CF, true) --- INPUT_MELEE_GRAPPLE_CHOKE
                 end
                 CreateInteractions(showinteraction)
             else

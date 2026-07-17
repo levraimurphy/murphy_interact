@@ -286,17 +286,24 @@ exports('AddLocalEntityInteraction', api.addLocalEntityInteraction)
 function api.addEntityInteraction(data)
     local netId = data.netId
 
-    -- If the netId does not exist, we assume it is an entity
-    if not netId or not NetworkDoesNetworkIdExist(netId) then
-        local entity = data.entity or data.netId
-
-        if DoesEntityExist(entity) then
-            data.entity = entity
-
+    -- If the caller explicitly passed a local entity handle, register it as a local
+    -- interaction. We only treat `data.entity` as a handle here — NEVER `data.netId`:
+    -- a network id is not an entity handle, and passing one to DoesEntityExist crashes
+    -- the engine (native 0xd42bd6eb2e0f1677). Use AddLocalEntityInteraction for handles.
+    if data.entity then
+        if DoesEntityExist(data.entity) then
             return api.addLocalEntityInteraction(data)
         end
+        return
     end
 
+    if not netId then return end
+
+    -- A networked entity may not be streamed into our local pool yet (late-join, or the
+    -- registering player is far away). We register the interaction against the netId
+    -- regardless of current stream state: the main loop resolves it lazily via
+    -- entities.isNetIdNearby() once the ped streams in, so far/late players still get the
+    -- menu when they get close. Do not gate on NetworkDoesNetworkIdExist here.
     if NetworkDoesNetworkIdExist(netId) then
         if not Entity(NetworkGetEntityFromNetworkId(netId)).state.hasInteractOptions then
             TriggerServerEvent('interact:setEntityHasOptions', netId)
@@ -766,6 +773,11 @@ function api.getNearbyInteractions()
     if amountOfInteractions > 0 then
         for i = 1, amountOfInteractions do
             local interaction = filteredInteractions[i]
+
+            -- filteredInteractions can shrink mid-scan: a canInteract callback may yield
+            -- (e.g. a blocking server callback) and another thread removes interactions,
+            -- leaving this index empty. Skip it instead of indexing nil.
+            if not interaction then goto skip end
 
             if interaction.global then
                 addGlobalVehicleData(interaction, options, playercoords)
